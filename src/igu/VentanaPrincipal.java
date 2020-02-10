@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
+import dpigUser.rules.Alert;
 import igu.acciones.AccionBotonAccederAVentanaAlumno;
 import igu.acciones.AccionBotonAddHorario;
 import igu.model.AccesoClase;
@@ -56,10 +57,12 @@ public class VentanaPrincipal extends JFrame {
 	private JPanel panel_7;
 	private JPanel panel_8;
 	
-	private String[] daysNames = {"Lunes", "Martes", "Miércoles", "Jueves", "Viernes"};
+	private String[] daysNames = {"Lunes", "Martes", "Miércoles", "Jueves", "Viernes","Sabado","Domingo"};
 	
 	private List<HoraClase> horasClase = new ArrayList<HoraClase>();
 	private List<AccesoClase> accesosClase = new ArrayList<AccesoClase>();
+	private List<AccesoClase> salidasClase = new ArrayList<AccesoClase>();
+	private List<Alert> alerts = new ArrayList<Alert>();
 	private JPanel panel_9;
 	private JPanel panel_11;
 	private JLabel lblAlumno;
@@ -92,11 +95,11 @@ public class VentanaPrincipal extends JFrame {
 	 */
 	public VentanaPrincipal() {
 		PersonsActions personsActions = new PersonsActions(this);
-		personsActions.start();
+		personsActions.startConnectionToDPIGServer(4999);
 		
 		setTitle("Sistema de asistencia a clase");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 854, 345);
+		setBounds(100, 100, 854, 396);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -147,7 +150,7 @@ public class VentanaPrincipal extends JFrame {
 				}
 				{
 					comboHoraDesde = new JComboBox();
-					for (int i = 9; i <= 20; i++) {
+					for (int i = 9; i <= 23; i++) {
 						comboHoraDesde.addItem(i+":00");
 					}
 					panel_3.add(comboHoraDesde);
@@ -159,7 +162,7 @@ public class VentanaPrincipal extends JFrame {
 				}
 				{
 					comboHoraHasta = new JComboBox();
-					for (int i = 9; i <= 20; i++) {
+					for (int i = 9; i <= 23; i++) {
 						comboHoraHasta.addItem(i+":00");
 					}
 					panel_3.add(comboHoraHasta);
@@ -251,8 +254,8 @@ public class VentanaPrincipal extends JFrame {
 	}
 	
 	public Object[][] getDataTable(){
-		Object[][] data = new Object[20-9][this.daysNames.length+1];
-		for (int i = 9; i < 20; i++) {
+		Object[][] data = new Object[23-9][this.daysNames.length+1];
+		for (int i = 9; i < 23; i++) {
 			String rangoHorario = i+":00-" + (i+1)+":00";
 			for (int j = 0; j < (this.daysNames.length+1); j++) {
 				if(j==0){
@@ -304,7 +307,7 @@ public class VentanaPrincipal extends JFrame {
 		LocalDateTime actualDate = LocalDateTime.now();
 		
 		LocalDateTime lunesDate = actualDate.minusDays(diaSemana-2);
-		LocalDateTime viernesDate = actualDate.plusDays(6-diaSemana);
+		LocalDateTime viernesDate = actualDate.plusDays(8-diaSemana);
 		
 		DateTimeFormatter formmat1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		
@@ -335,8 +338,16 @@ public class VentanaPrincipal extends JFrame {
 		return this.accesosClase;
 	}
 	
+	public List<AccesoClase> getSalidasClase(){
+		return this.salidasClase;
+	}
+	
 	public Map<String, Long> getTimes(){
 		return this.times;
+	}
+	
+	public List<Alert> getAlerts(){
+		return this.alerts;
 	}
 
 }

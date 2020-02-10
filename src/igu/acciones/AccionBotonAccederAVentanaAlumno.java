@@ -23,7 +23,8 @@ public class AccionBotonAccederAVentanaAlumno implements ActionListener{
 		String semanaActual = this.ventanaPrincipal.getSemanaActual();
 		List<HoraClase> horasClase = this.ventanaPrincipal.getHorasClase();
 		List<AccesoClase> accesosClase = this.ventanaPrincipal.getAccesosClase();
-		new VentanaAccesosAlumno(ventanaPrincipal,alumno, semanaActual, horasClase, accesosClase).setVisible(true);
+		List<AccesoClase> salidasClase = this.ventanaPrincipal.getSalidasClase();
+		new VentanaAccesosAlumno(ventanaPrincipal,alumno, semanaActual, horasClase, accesosClase, salidasClase, this.ventanaPrincipal.getAlerts()).setVisible(true);
 	}
 
 }

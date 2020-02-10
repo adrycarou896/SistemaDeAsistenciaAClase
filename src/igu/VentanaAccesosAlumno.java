@@ -1,33 +1,28 @@
 package igu;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 
+import dpigUser.rules.Alert;
 import igu.acciones.AccionBotonActualizarAccesos;
 import igu.acciones.AccionBotonCerrarAccesosAlumno;
+import igu.acciones.Actualizar;
 import igu.model.AccesoClase;
 import igu.model.HoraClase;
 import igu.table.RowsAccesosRendered;
-
-import java.awt.GridLayout;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
-import java.awt.FlowLayout;
 
 public class VentanaAccesosAlumno extends JFrame {
 
@@ -37,6 +32,8 @@ public class VentanaAccesosAlumno extends JFrame {
 	private Date fechaViernes;
 	private List<HoraClase> horasClase;
 	private List<AccesoClase> accesosClase;
+	private List<AccesoClase> salidasClase;
+	private List<Alert> alerts;
 	
 	private JPanel panel;
 	private JLabel label;
@@ -54,7 +51,6 @@ public class VentanaAccesosAlumno extends JFrame {
 	private JPanel panel_5;
 	
 	private JTable tableAccesos;
-	private JButton btnActualizar;
 	private JPanel panel_6;
 	private JPanel panel_7;
 	private JPanel panel_8;
@@ -62,16 +58,20 @@ public class VentanaAccesosAlumno extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VentanaAccesosAlumno(VentanaPrincipal ventanaPrincipal, String alumno, String semanaActual, List<HoraClase> horasClase, List<AccesoClase> accesosClase) {
+	public VentanaAccesosAlumno(VentanaPrincipal ventanaPrincipal, String alumno, String semanaActual, List<HoraClase> horasClase, 
+	    List<AccesoClase> accesosClase, List<AccesoClase> salidasClase,List<Alert> alerts) {
 		setTitle("Sistema de asistencia a clase");
 		this.alumno = alumno;
 		this.fechaLunes=getFechaLunes(semanaActual);
 		this.fechaViernes=getFechaViernes(semanaActual);
 		this.horasClase = horasClase;
 		this.accesosClase = accesosClase;
+		this.salidasClase = salidasClase;
+		this.alerts = alerts;
+		
 		this.ventanaPrincipal = ventanaPrincipal;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 539, 335);
+		setBounds(100, 100, 663, 362);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -85,6 +85,8 @@ public class VentanaAccesosAlumno extends JFrame {
 		this.tableAccesos.setDefaultRenderer(Object.class, rra);
 		this.tableAccesos.setVisible(false);
 		this.tableAccesos.setVisible(true);
+		
+		new Actualizar(this).start();
 	}
 	
 	private Date getFechaLunes(String semanaActual){
@@ -164,7 +166,7 @@ public class VentanaAccesosAlumno extends JFrame {
 		return lbUsuario;
 	}
 	
-	private JLabel getLbSemanaActual(String semanaActual) {
+	public JLabel getLbSemanaActual(String semanaActual) {
 		if (semanaActualLabel == null) {
 			semanaActualLabel = new JLabel("Semana del "+semanaActual.split("-")[0]+" al "+semanaActual.split("-")[1]);
 			semanaActualLabel.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -189,7 +191,6 @@ public class VentanaAccesosAlumno extends JFrame {
 			panel_3.add(getPanel_8());
 			panel_3.add(getPanel_7());
 			panel_3.add(getPanel_6());
-			panel_3.add(getBtnActualizar());
 		}
 		return panel_3;
 	}
@@ -201,7 +202,8 @@ public class VentanaAccesosAlumno extends JFrame {
 			JScrollPane scrollPane = new JScrollPane(tableAccesos);
 			tableAccesos.setFillsViewportHeight(true);
 			panel_4 = new JPanel();
-			panel_4.add(scrollPane, BorderLayout.CENTER);
+			panel_4.setLayout(new BorderLayout(0, 0));
+			panel_4.add(scrollPane);
 		}
 		return panel_4;
 	}
@@ -227,13 +229,13 @@ public class VentanaAccesosAlumno extends JFrame {
 	public List<AccesoClase> getAccesosClase(){
 		return this.accesosClase;
 	}
-	private JButton getBtnActualizar() {
-		if (btnActualizar == null) {
-			btnActualizar = new JButton("Actualizar");
-			btnActualizar.addActionListener(new AccionBotonActualizarAccesos(this));
-		}
-		return btnActualizar;
+	public List<AccesoClase> getSalidasClase(){
+		return this.salidasClase;
 	}
+	public List<Alert> getAlerts(){
+		return this.alerts;
+	}
+	
 	private JPanel getPanel_6() {
 		if (panel_6 == null) {
 			panel_6 = new JPanel();

@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -41,9 +42,11 @@ public class RowsAccesosRendered extends DefaultTableCellRenderer{
 				String alumnoName = this.ventanaAccesosAlumno.getAlumno();
 				
 				List<AccesoClase> accesosClase = this.ventanaAccesosAlumno.getAccesosClase();
+				List<AccesoClase> salidasClase = this.ventanaAccesosAlumno.getSalidasClase();
 				List<HoraClase> horasClase = this.ventanaAccesosAlumno.getVentanaPrincipal().getHorasClase();
 				
-						
+				boolean isGreen = false;	
+				boolean isGray = false;
 				for (HoraClase horaClase : horasClase) {
 					int dia = getNumDiaSemana(horaClase.getDiaSemana());
 					int horaDesde = horaClase.getHoraDesde();
@@ -60,12 +63,38 @@ public class RowsAccesosRendered extends DefaultTableCellRenderer{
 									
 									if(dia==diaSemanaReconocido && horaReconocido>=horaDesde && horaReconocido<=horaHasta){
 										this.setBackground(Color.GREEN);
-										this.setToolTipText("into class: "+this.ventanaAccesosAlumno.getVentanaPrincipal().getTimes().get(alumnoName));
-										return this;
+										this.setText("En clase");
+										//this.setToolTipText("into class: "+this.ventanaAccesosAlumno.getVentanaPrincipal().getTimes().get(alumnoName));
+										isGreen = true;
 									}	
 								}
 							}
-							this.setBackground(Color.RED);
+							for (AccesoClase salidaClase : salidasClase) {
+								if(salidaClase.getNameReconocido().equals(alumnoName)){
+									Date fechaReconocido = salidaClase.getDateReconocido();
+									DateFormat hourFormat = new SimpleDateFormat("HH");
+									int horaReconocido = Integer.parseInt(hourFormat.format(fechaReconocido));		
+									int diaSemanaReconocido = getDiaSemana(convertToLocalDateViaInstant(fechaReconocido));	
+									
+									if(dia==diaSemanaReconocido && horaReconocido>=horaDesde && horaReconocido<=horaHasta){
+										this.setBackground(Color.LIGHT_GRAY);
+										this.setText("Asistió");
+										
+										SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+										
+										AccesoClase accesoClase = getPerson(accesosClase, salidaClase.getNameReconocido());
+										
+										String inicio = format.format(accesoClase.getDateReconocido());
+										String fin = format.format(salidaClase.getDateReconocido());
+										
+										this.setToolTipText(inicio+" - "+fin);
+										isGray = true;
+									}	
+								}
+							}
+							if(!isGray & !isGreen){
+								this.setBackground(Color.LIGHT_GRAY);
+							}
 							return this;
 						}
 					}
@@ -75,6 +104,15 @@ public class RowsAccesosRendered extends DefaultTableCellRenderer{
 		
 		this.setBackground(Color.WHITE);
 		return this;
+	}
+	
+	private AccesoClase getPerson(List<AccesoClase> accesos, String name){
+		for (AccesoClase accesoClase : accesos) {
+			if(accesoClase.getNameReconocido().equals(name)){
+				return accesoClase;
+			}
+		}
+		return null;
 	}
 	
 	private int getNumDiaSemana(String dia){
